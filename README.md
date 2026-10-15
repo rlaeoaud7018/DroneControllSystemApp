@@ -53,7 +53,7 @@ backend-api  ──집계(1분/일별)──  DB
 - [x] mobile-app에 지도 화면(Google Maps SDK for Android) 추가 — 구역 마커 표시, 마커 클릭 시 구역 상세로 이동. 실제 에뮬레이터로 검증 완료 (Android 전용 Maps API 키 별도 발급)
 - [x] analysis-server: 이동 분석(속도·8방향) 추가 + 더미 영상 다양화 — 초상권/개인정보 문제를 피하려고 출처 불명 영상 대신 라이선스가 명확한 해외 스톡 영상을 추가로 받아 16개 카메라에 두 영상을 번갈아 배정, 라이브 뷰 끊김 버그와 동시 분석 충돌 버그도 같이 수정 ([analysis-server/README.md](analysis-server/README.md))
 - [x] 통계 엑셀 다운로드(Apache POI) · SSE 실시간 스트림 · 녹화 재생(recordings 이력+타임라인) · 임계치 설정 전용 관리자 화면("관리" 탭) — 전부 실제 MySQL+Spring Boot 기동 후 curl과 Chrome 헤드리스 브라우저 클릭 테스트로 검증 완료
-- [ ] 구역 간 이동 조회(`zone_flows` 집계), 비밀번호 재설정, 관리자 간 관리 기능 ← 다음 할 일
+- [x] 구역 간 이동 조회(`zone_flows` 집계) · 비밀번호 재설정 · 관리자 간 관리 기능(acman-004~006) — 전부 실제 MySQL+Spring Boot 기동 후 curl로 end-to-end 검증 완료 (전용 화면은 없고 API만 구현) ([backend-api/README.md](backend-api/README.md))
 
 혼자 진행하는 프로젝트라 역할 분배는 하지 않고, 아래 순서로 순차 진행한다.
 
@@ -70,4 +70,5 @@ backend-api  ──집계(1분/일별)──  DB
 7. ~~회원/이벤트/히스토리~~ (완료, [backend-api/README.md](backend-api/README.md))
 8. ~~web-dashboard에 로그인/이벤트 화면 연결~~ (완료, [web-dashboard/README.md](web-dashboard/README.md))
 9. ~~mobile-app에 로그인/이벤트 화면 연결~~ (완료, [mobile-app/README.md](mobile-app/README.md))
-10. 엑셀 다운로드, SSE 실시간 스트림, 녹화 재생, 임계치 설정 UI 등 세부 기능 ← 지금 여기
+10. ~~엑셀 다운로드, SSE 실시간 스트림, 녹화 재생, 임계치 설정 UI 등 세부 기능~~ (완료)
+11. ~~구역 간 이동 조회, 비밀번호 재설정, 관리자 간 관리 기능~~ (완료 — 전 과정 API 구현·검증 끝)

@@ -35,6 +35,9 @@ public interface UserMapper {
 	@Update("UPDATE users SET role = #{role} WHERE id = #{id}")
 	int updateRole(@Param("id") int id, @Param("role") String role);
 
+	@Update("UPDATE users SET password_encoded = #{passwordEncoded} WHERE id = #{id}")
+	int updatePassword(@Param("id") int id, @Param("passwordEncoded") String passwordEncoded);
+
 	@org.apache.ibatis.annotations.Delete("DELETE FROM users WHERE id = #{id}")
 	int deleteUser(int id);
 

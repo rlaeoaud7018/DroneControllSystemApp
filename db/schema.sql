@@ -118,7 +118,7 @@ CREATE TABLE zone_stats_daily (
     UNIQUE KEY uq_zone_date (zone_id, date)
 );
 
--- 구역 간 이동 (stats-006)
+-- 구역 간 이동 (stats-006). zone_stats_minute의 outflow_n/e/s/w + zone_neighbors로 분단위 집계.
 CREATE TABLE zone_flows (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     from_zone_id BIGINT NOT NULL,
@@ -126,7 +126,8 @@ CREATE TABLE zone_flows (
     at           DATETIME NOT NULL,
     count        INT NOT NULL,
     CONSTRAINT fk_flow_from FOREIGN KEY (from_zone_id) REFERENCES zones(id),
-    CONSTRAINT fk_flow_to FOREIGN KEY (to_zone_id) REFERENCES zones(id)
+    CONSTRAINT fk_flow_to FOREIGN KEY (to_zone_id) REFERENCES zones(id),
+    UNIQUE KEY uq_flow_minute (from_zone_id, to_zone_id, at)
 );
 
 -- 혼잡 단계 임계치 설정 (evthres-001~003)

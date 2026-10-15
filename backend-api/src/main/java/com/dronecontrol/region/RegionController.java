@@ -15,12 +15,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dronecontrol.stats.StatsService;
+import com.dronecontrol.zone.ZoneFlow;
+import com.dronecontrol.zone.ZoneFlowService;
+
 @RestController
 @RequestMapping("/api/v1/regions")
 public class RegionController {
 
 	@Autowired
 	private RegionService regionService;
+
+	@Autowired
+	private ZoneFlowService zoneFlowService;
 
 	@GetMapping
 	public List<Region> list(@RequestParam(required = false) Integer parentId) {
@@ -52,6 +59,12 @@ public class RegionController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "없는 지역입니다."));
 		}
 		return ResponseEntity.ok(updated);
+	}
+
+	/** 구역 간 이동 조회(stats-006). id는 동(DONG) 레벨 지역. */
+	@GetMapping("/{id}/flows")
+	public List<ZoneFlow> flows(@PathVariable int id, @RequestParam String from, @RequestParam String to) {
+		return zoneFlowService.getFlowsByDong(id, StatsService.toMysqlDateTime(from, false), StatsService.toMysqlDateTime(to, false));
 	}
 
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.dronecontrol.event.EventService;
+import com.dronecontrol.zone.ZoneFlowService;
 
 @Service
 public class StatsService {
@@ -26,6 +27,9 @@ public class StatsService {
 
 	@Autowired
 	private EventService eventService;
+
+	@Autowired
+	private ZoneFlowService zoneFlowService;
 
 	/** zoneId -> 구독 중인 SSE 연결 목록 (sse-001). 메모리 상주라 서버 재시작 시 초기화됨. */
 	private final Map<Integer, List<SseEmitter>> emittersByZoneId = new ConcurrentHashMap<>();
@@ -92,9 +96,10 @@ public class StatsService {
 
 		eventService.checkAndRecord(zoneArea.getZoneId(), sample.getCameraId(), density);
 
-		if (emittersByZoneId.containsKey(zoneArea.getZoneId())) {
-			ZoneMinuteStat latest = statsMapper.selectMinuteStatAt(zoneArea.getZoneId(), minuteAt);
-			if (latest != null) {
+		ZoneMinuteStat latest = statsMapper.selectMinuteStatAt(zoneArea.getZoneId(), minuteAt);
+		if (latest != null) {
+			zoneFlowService.recordFlows(zoneArea.getZoneId(), minuteAt, latest);
+			if (emittersByZoneId.containsKey(zoneArea.getZoneId())) {
 				broadcast(zoneArea.getZoneId(), latest);
 			}
 		}
