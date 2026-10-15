@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>드론관제시스템</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+	<h1>드론관제시스템</h1>
+
+	<nav class="main-tabs">
+		<button class="main-tab-btn active" data-maintab="dashboard">대시보드</button>
+		<button class="main-tab-btn" data-maintab="stats">통계 · 구역 비교</button>
+		<button class="main-tab-btn" data-maintab="events">이벤트 로그 <span id="eventBadge" class="event-badge" style="display:none;">0</span></button>
+	</nav>
+
+	<div class="topbar-hint">지도를 움직이면 화면 안의 카메라가 위에 갱신됩니다 · 카드를 클릭하면 확대 · 지도 빈 곳을 우클릭하면 카메라 추가</div>
+
+	<div class="legend">
+		<span class="legend-item"><i class="dot normal"></i>정상 <b id="legendNormal">0</b></span>
+		<span class="legend-item"><i class="dot caution"></i>주의 <b id="legendCaution">0</b></span>
+		<span class="legend-item"><i class="dot danger"></i>위험 <b id="legendDanger">0</b></span>
+	</div>
+
+	<div id="userInfo" class="user-info"></div>
+</header>
+
+<div class="filter-bar">
+	<span class="filter-label">지역 필터</span>
+	<select id="filterCity"><option value="">시 선택</option></select>
+	<select id="filterGu"><option value="">구 선택</option></select>
+	<select id="filterDong"><option value="">동 선택</option></select>
+	<button id="regionEditBtn">지역 등록수정</button>
+</div>
+
+<div id="loginOverlay" class="overlay">
+	<div class="auth-box">
+		<h2>드론관제시스템</h2>
+
+		<div class="auth-tabs">
+			<button class="auth-tab-btn active" data-authtab="login">로그인</button>
+			<button class="auth-tab-btn" data-authtab="register">회원가입</button>
+		</div>
+
+		<form id="loginForm" class="auth-form active">
+			<input type="text" id="loginLoginId" placeholder="아이디" autocomplete="username" required>
+			<input type="password" id="loginPassword" placeholder="비밀번호" autocomplete="current-password" required>
+			<button type="submit">로그인</button>
+			<p id="loginError" class="auth-error"></p>
+		</form>
+
+		<form id="registerForm" class="auth-form">
+			<input type="text" id="regLoginId" placeholder="아이디" required>
+			<input type="password" id="regPassword" placeholder="비밀번호" required>
+			<input type="text" id="regName" placeholder="이름" required>
+			<input type="email" id="regEmail" placeholder="이메일" required>
+			<input type="tel" id="regPhone" placeholder="전화번호">
+			<button type="submit">가입하기</button>
+			<p id="registerError" class="auth-error"></p>
+			<p class="auth-hint">※ 첫 가입자는 자동으로 최고관리자가 됩니다. 이후 가입자는 관리자 승인 전까지 이용할 수 없습니다.</p>
+		</form>
+	</div>
+</div>
+
+<div id="pendingOverlay" class="overlay">
+	<div class="auth-box">
+		<h2>승인 대기 중</h2>
+		<p>관리자 승인 후 이용할 수 있습니다.</p>
+		<button id="pendingLogoutBtn">로그아웃</button>
+	</div>
+</div>
+
+<div id="dashboardRoot">
+
+	<!-- ---------- 대시보드 ---------- -->
+	<div id="dashboardMainPanel" class="main-tab-panel active">
+
+		<div id="mapSection" class="map-section">
+			<div id="map"></div>
+
+			<button id="statsToggleBtn" class="stats-toggle-btn">▶ 통계</button>
+
+			<aside id="statsSidebar" class="stats-sidebar"></aside>
+
+			<div id="mapResizeHandle" class="map-resize-handle"><span></span></div>
+		</div>
+
+		<section class="camera-grid-wrap">
+			<div class="camera-grid-header">
+				<h3>지도 화면 안 카메라 <span id="cameraGridCount">0</span> 대</h3>
+				<div class="camera-grid-controls">
+					<button id="splitAllBtn" class="active">전체 펼치기</button>
+					<button id="split4Btn">4분할 보기</button>
+				</div>
+			</div>
+			<div id="cameraGrid" class="camera-grid"></div>
+		</section>
+
+	</div>
+
+	<!-- ---------- 통계 · 구역 비교 ---------- -->
+	<div id="statsMainPanel" class="main-tab-panel">
+		<div class="stats-overview-status">
+			<span class="live-dot"></span>
+			실시간 감시 중 · 카메라 <b id="statsLiveCameras">0</b>/<b id="statsTotalCameras">0</b> 연결
+			<span class="stats-overview-time">갱신 <span id="statsOverviewTime">-</span></span>
+		</div>
+		<div id="statsFullHost" class="stats-full-host"></div>
+	</div>
+
+	<!-- ---------- 이벤트 로그 ---------- -->
+	<div id="eventsMainPanel" class="main-tab-panel">
+		<h2>이벤트 로그</h2>
+		<div id="eventList" class="event-list"></div>
+	</div>
+
+</div><!-- /dashboardRoot -->
+
+<!-- 통계 패널 내용 (대시보드 탭의 오버레이 사이드바 / 통계 탭의 전체 화면, 둘 중 한 곳에 붙여서 재사용) -->
+<template id="statsPanelTemplate">
+	<div class="stats-panel-content">
+		<div class="stats-panel-header">
+			<h3>통계 <span class="muted">화면 안 카메라 <b class="statsCamCount">0</b>대</span></h3>
+			<select class="statsRefreshInterval">
+				<option value="5">5초</option>
+				<option value="10" selected>10초</option>
+				<option value="30">30초</option>
+			</select>
+			<button class="statsCollapseBtn icon-btn" title="닫기">◀</button>
+		</div>
+
+		<div class="stats-block">
+			<div class="stats-metric-tabs">
+				<button class="stats-metric-tab active" data-metric="count">현재 인원</button>
+				<button class="stats-metric-tab" data-metric="event">이벤트</button>
+				<button class="stats-metric-tab" data-metric="level">혼잡 단계</button>
+			</div>
+			<div class="donut-wrap">
+				<canvas class="donutChart"></canvas>
+				<div class="donut-center"><b class="donutTotal">0</b><span class="donutUnit">명</span></div>
+			</div>
+			<ul class="donut-legend"></ul>
+		</div>
+
+		<div class="stats-block collapsible" data-section="summary">
+			<button class="stats-block-toggle"><span>요약 (대시보드)</span><i class="chevron">▾</i></button>
+			<div class="stats-block-body">
+				<div class="summary-grid">
+					<div class="summary-box"><i class="summary-icon icon-cam"></i><span class="sumCameraCount">0</span><label>카메라</label></div>
+					<div class="summary-box"><i class="summary-icon icon-people"></i><span class="sumTotalCount">0</span><label>현재 총 인원</label></div>
+					<div class="summary-box"><i class="summary-icon icon-density"></i><span class="sumDensity">0</span><label>평균 밀집도</label></div>
+					<div class="summary-box warn"><i class="summary-icon icon-warn"></i><span class="sumWorstZone">-</span><label>가장 혼잡한 구역</label></div>
+					<div class="summary-box"><i class="summary-icon icon-event"></i><span class="sumEventCount">0</span><label>오늘 이벤트</label></div>
+					<div class="summary-box"><i class="summary-icon icon-max"></i><span class="sumMaxCount">0</span><label>최대 인원</label></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="stats-block collapsible collapsed" data-section="density">
+			<button class="stats-block-toggle"><span>인원수 · 밀집도</span><i class="chevron">▸</i></button>
+			<div class="stats-block-body"><div class="densityDetailBody"></div></div>
+		</div>
+
+		<div class="stats-block collapsible collapsed" data-section="flow">
+			<button class="stats-block-toggle"><span>유입 · 유출 (추정)</span><i class="chevron">▸</i></button>
+			<div class="stats-block-body"><div class="flowDetailBody"></div></div>
+		</div>
+
+		<div class="stats-block collapsible collapsed" data-section="movement">
+			<button class="stats-block-toggle"><span>이동 분석 (속도 · 방향)</span><i class="chevron">▸</i></button>
+			<div class="stats-block-body"><div class="movementDetailBody"></div></div>
+		</div>
+
+		<div class="stats-block collapsible collapsed" data-section="threshold">
+			<button class="stats-block-toggle"><span>혼잡 정도 · 기준 설정</span><i class="chevron">▸</i></button>
+			<div class="stats-block-body"><div class="thresholdDetailBody"></div></div>
+		</div>
+
+		<div class="stats-block collapsible collapsed" data-section="peak">
+			<button class="stats-block-toggle"><span>피크 시간 TOP3 · 증감 추세</span><i class="chevron">▸</i></button>
+			<div class="stats-block-body"><div class="peakDetailBody"></div></div>
+		</div>
+
+		<div class="stats-block collapsible collapsed" data-section="anomaly">
+			<button class="stats-block-toggle"><span>비정상 인원 변동</span><i class="chevron">▸</i></button>
+			<div class="stats-block-body"><div class="anomalyDetailBody"></div></div>
+		</div>
+	</div>
+</template>
+
+<!-- 카메라 확대 모달 (카드를 클릭하면 뜸) -->
+<div id="cameraModalOverlay" class="camera-modal-overlay">
+	<div class="camera-modal">
+		<button id="cameraModalClose" class="modal-close">×</button>
+		<h2 id="detailTitle">카메라</h2>
+
+		<div class="stats-panel">
+			<div class="stat-box"><span id="statCount">-</span><label>현재 인원</label></div>
+			<div class="stat-box"><span id="statDensity">-</span><label>밀집도 (명/㎡)</label></div>
+			<div class="stat-box"><span id="statDwell">-</span><label>평균 체류(초)</label></div>
+		</div>
+
+		<canvas id="chart" height="90"></canvas>
+
+		<div id="cameraDetail" class="camera-detail"></div>
+	</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="js/app.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap" async defer></script>
+
+</body>
+</html>

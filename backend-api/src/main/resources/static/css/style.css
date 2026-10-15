@@ -1,0 +1,1051 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+	background: #0f1115;
+	color: #e8e8e8;
+}
+
+/* ---------- 상단바 ---------- */
+
+.topbar {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 18px;
+	padding: 10px 20px;
+	background: #1a1d24;
+	border-bottom: 1px solid #2a2e37;
+}
+
+.topbar h1 {
+	font-size: 18px;
+	margin: 0;
+	white-space: nowrap;
+}
+
+.main-tabs {
+	display: flex;
+	gap: 4px;
+}
+
+.main-tab-btn {
+	background: none;
+	border: 1px solid transparent;
+	color: #9aa0ab;
+	padding: 7px 14px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 13px;
+	white-space: nowrap;
+}
+
+.main-tab-btn.active {
+	background: #4fc3f7;
+	color: #0f1115;
+	font-weight: bold;
+}
+
+.topbar-hint {
+	flex: 1;
+	min-width: 220px;
+	font-size: 11px;
+	color: #6b7280;
+}
+
+.legend {
+	display: flex;
+	gap: 18px;
+	font-size: 13px;
+}
+
+.legend-item {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.legend-item b {
+	font-size: 14px;
+}
+
+.dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.dot.normal { background: #4fc3f7; }
+.dot.caution { background: #ffd166; }
+.dot.danger { background: #ff5c5c; }
+
+/* ---------- 지역 필터 ---------- */
+
+.filter-bar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 20px;
+	background: #14161c;
+	border-bottom: 1px solid #2a2e37;
+}
+
+.filter-label {
+	font-size: 12px;
+	color: #9aa0ab;
+	margin-right: 4px;
+}
+
+.filter-bar select {
+	background: #1d212a;
+	border: 1px solid #2a2e37;
+	color: #e8e8e8;
+	padding: 6px 10px;
+	border-radius: 6px;
+	font-size: 12px;
+}
+
+.filter-bar button {
+	margin-left: auto;
+	background: none;
+	border: 1px solid #2a2e37;
+	color: #9aa0ab;
+	padding: 6px 12px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 12px;
+}
+
+/* ---------- 메인 탭 패널 ---------- */
+
+.main-tab-panel {
+	display: none;
+}
+
+.main-tab-panel.active {
+	display: block;
+}
+
+/* ---------- 대시보드: 지도 영역 ---------- */
+
+.map-section {
+	position: relative;
+	height: 280px;
+	min-height: 140px;
+	max-height: 80vh;
+	background: #1d212a;
+	border-bottom: 1px solid #2a2e37;
+}
+
+#map {
+	position: absolute;
+	inset: 0;
+}
+
+.stats-toggle-btn {
+	position: absolute;
+	left: 12px;
+	bottom: 12px;
+	z-index: 5;
+	background: #1d212a;
+	border: 1px solid #2a2e37;
+	color: #e8e8e8;
+	padding: 8px 14px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.map-resize-handle {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 10px;
+	cursor: ns-resize;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 6;
+}
+
+.map-resize-handle span {
+	width: 48px;
+	height: 4px;
+	border-radius: 2px;
+	background: #4a5160;
+}
+
+/* ---------- 통계 패널 (사이드바 오버레이 / 전체 화면 공용) ---------- */
+
+.stats-sidebar {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 320px;
+	background: rgba(20, 22, 28, 0.97);
+	border-right: 1px solid #2a2e37;
+	transform: translateX(-100%);
+	transition: transform 0.2s ease;
+	z-index: 4;
+	overflow-y: auto;
+}
+
+.stats-sidebar.open {
+	transform: translateX(0);
+}
+
+.stats-full-host {
+	padding: 20px;
+}
+
+.stats-full-host .stats-panel-content {
+	max-width: 640px;
+}
+
+.stats-full-host .statsCollapseBtn {
+	display: none;
+}
+
+/* ---------- 통계 탭: 상단 상태바 ---------- */
+
+.stats-overview-status {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
+	color: #cfd3da;
+	padding: 16px 20px 0;
+}
+
+.live-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #6ee89a;
+	box-shadow: 0 0 0 0 rgba(110, 232, 154, 0.6);
+	animation: live-pulse 1.8s infinite;
+}
+
+@keyframes live-pulse {
+	0% { box-shadow: 0 0 0 0 rgba(110, 232, 154, 0.5); }
+	70% { box-shadow: 0 0 0 7px rgba(110, 232, 154, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(110, 232, 154, 0); }
+}
+
+.stats-overview-status b {
+	color: #e8e8e8;
+}
+
+.stats-overview-time {
+	margin-left: auto;
+	color: #6b7280;
+	font-size: 12px;
+}
+
+.stats-panel-content {
+	padding: 14px;
+}
+
+.stats-panel-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+.stats-panel-header h3 {
+	font-size: 14px;
+	margin: 0;
+	flex: 1;
+}
+
+.stats-panel-header .muted {
+	display: block;
+	font-size: 11px;
+	color: #9aa0ab;
+	font-weight: normal;
+	margin-top: 2px;
+}
+
+.stats-panel-header select {
+	background: #1d212a;
+	border: 1px solid #2a2e37;
+	color: #e8e8e8;
+	padding: 4px 8px;
+	border-radius: 6px;
+	font-size: 11px;
+}
+
+.icon-btn {
+	background: none;
+	border: 1px solid #2a2e37;
+	color: #9aa0ab;
+	border-radius: 6px;
+	width: 26px;
+	height: 26px;
+	cursor: pointer;
+}
+
+.stats-block {
+	background: #1d212a;
+	border: 1px solid #2a2e37;
+	border-radius: 10px;
+	padding: 14px;
+	margin-bottom: 10px;
+}
+
+.stats-metric-tabs {
+	display: flex;
+	gap: 4px;
+	margin-bottom: 10px;
+}
+
+.stats-metric-tab {
+	flex: 1;
+	background: #14161c;
+	border: none;
+	color: #9aa0ab;
+	padding: 6px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 11px;
+}
+
+.stats-metric-tab.active {
+	background: #4fc3f7;
+	color: #0f1115;
+	font-weight: bold;
+}
+
+.donut-wrap {
+	position: relative;
+	max-width: 190px;
+	margin: 4px auto 0;
+}
+
+.donut-center {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+}
+
+.donut-center b {
+	font-size: 24px;
+}
+
+.donut-center span {
+	font-size: 11px;
+	color: #9aa0ab;
+}
+
+.donut-legend {
+	list-style: none;
+	padding: 0;
+	margin: 14px 0 0;
+	font-size: 12px;
+}
+
+.donut-legend li {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 5px 8px;
+	border-radius: 6px;
+}
+
+.donut-legend li:nth-child(odd) {
+	background: #14161c;
+}
+
+.donut-legend .swatch {
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	display: inline-block;
+	flex-shrink: 0;
+}
+
+.donut-legend .bar-track {
+	flex: 1;
+	height: 5px;
+	background: #14161c;
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+.donut-legend .bar-fill {
+	height: 100%;
+	border-radius: 3px;
+}
+
+.donut-legend .count {
+	color: #4fc3f7;
+	font-weight: bold;
+	min-width: 34px;
+	text-align: right;
+}
+
+.stats-block-toggle {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: none;
+	border: none;
+	color: #e8e8e8;
+	font-size: 13px;
+	padding: 0;
+	cursor: pointer;
+}
+
+.stats-block-toggle .chevron {
+	color: #9aa0ab;
+	font-style: normal;
+}
+
+.stats-block.collapsible .stats-block-body {
+	margin-top: 12px;
+}
+
+.stats-block.collapsible.collapsed .stats-block-body {
+	display: none;
+}
+
+.summary-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+}
+
+.summary-box {
+	background: #14161c;
+	border: 1px solid #22262f;
+	border-radius: 8px;
+	padding: 10px;
+	text-align: center;
+}
+
+.summary-icon {
+	display: block;
+	width: 8px;
+	height: 8px;
+	margin: 0 auto 6px;
+	border-radius: 50%;
+}
+
+.summary-icon.icon-cam { background: #4fc3f7; }
+.summary-icon.icon-people { background: #6ee89a; }
+.summary-icon.icon-density { background: #b39ddb; }
+.summary-icon.icon-warn { background: #ff5c5c; }
+.summary-icon.icon-event { background: #ffd166; }
+.summary-icon.icon-max { background: #f48fb1; }
+
+.summary-box span {
+	display: block;
+	font-size: 18px;
+	font-weight: bold;
+	color: #4fc3f7;
+}
+
+.summary-box.warn span {
+	color: #ff5c5c;
+	font-size: 14px;
+}
+
+.summary-box label {
+	font-size: 10px;
+	color: #9aa0ab;
+}
+
+.detail-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
+}
+
+.detail-table th,
+.detail-table td {
+	text-align: left;
+	padding: 5px 4px;
+	border-bottom: 1px solid #2a2e37;
+	color: #cfd3da;
+}
+
+.detail-table th {
+	color: #9aa0ab;
+	font-weight: normal;
+}
+
+.trend-up { color: #ff8a8a; }
+.trend-down { color: #6ee89a; }
+.trend-flat { color: #9aa0ab; }
+
+.threshold-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 8px;
+	font-size: 12px;
+}
+
+.threshold-row label {
+	width: 70px;
+	color: #9aa0ab;
+}
+
+.threshold-row input {
+	flex: 1;
+	background: #14161c;
+	border: 1px solid #2a2e37;
+	border-radius: 6px;
+	padding: 5px 8px;
+	color: #e8e8e8;
+	font-size: 12px;
+}
+
+.threshold-row button {
+	background: #4fc3f7;
+	border: none;
+	color: #0f1115;
+	padding: 5px 10px;
+	border-radius: 6px;
+	font-size: 11px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.empty-note {
+	color: #6b7280;
+	font-size: 12px;
+}
+
+/* ---------- 카메라 카드 그리드 ---------- */
+
+.camera-grid-wrap {
+	padding: 14px 20px 24px;
+}
+
+.camera-grid-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 12px;
+}
+
+.camera-grid-header h3 {
+	font-size: 13px;
+	color: #9aa0ab;
+	margin: 0;
+	font-weight: normal;
+}
+
+.camera-grid-controls {
+	display: flex;
+	gap: 6px;
+}
+
+.camera-grid-controls button {
+	background: #1d212a;
+	border: 1px solid #2a2e37;
+	color: #9aa0ab;
+	padding: 6px 12px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 12px;
+}
+
+.camera-grid-controls button.active {
+	background: #4fc3f7;
+	border-color: #4fc3f7;
+	color: #0f1115;
+	font-weight: bold;
+}
+
+.camera-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+	gap: 14px;
+}
+
+.camera-grid.split4 {
+	grid-template-columns: repeat(2, minmax(260px, 1fr));
+}
+
+.cam-card {
+	background: #1d212a;
+	border-radius: 8px;
+	border: 2px solid transparent;
+	padding: 10px;
+	cursor: pointer;
+}
+
+.cam-card.selected {
+	border-color: #4fc3f7;
+}
+
+.cam-card-top {
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
+	margin-bottom: 4px;
+}
+
+.cam-checkbox {
+	margin-top: 2px;
+}
+
+.cam-card-title {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+	font-size: 13px;
+	font-weight: bold;
+}
+
+.level-badge {
+	font-size: 10px;
+	padding: 1px 7px;
+	border-radius: 8px;
+	font-weight: bold;
+}
+
+.level-badge.caution { background: #6b4e00; color: #ffd166; }
+.level-badge.danger { background: #5c0d0d; color: #ff8a8a; }
+
+.cam-card-location {
+	font-size: 11px;
+	color: #9aa0ab;
+	margin-bottom: 8px;
+}
+
+.cam-card-thumb {
+	width: 100%;
+	height: 110px;
+	background: #0f1115;
+	border-radius: 6px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #555b66;
+	font-size: 11px;
+	margin-bottom: 8px;
+}
+
+.camera-grid.split4 .cam-card-thumb {
+	height: 220px;
+}
+
+.cam-card-thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.cam-card-stats {
+	display: flex;
+	justify-content: space-between;
+	font-size: 11px;
+	color: #9aa0ab;
+	margin-bottom: 8px;
+}
+
+.cam-card-stats b {
+	color: #e8e8e8;
+}
+
+.cam-card-actions {
+	display: flex;
+	gap: 6px;
+}
+
+.cam-card-actions button {
+	flex: 1;
+	background: #4fc3f7;
+	border: none;
+	color: #0f1115;
+	padding: 6px 4px;
+	border-radius: 6px;
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 11px;
+}
+
+.cam-card-actions button.secondary {
+	background: #2a2f3a;
+	color: #cfd3da;
+}
+
+.cam-card-actions button:disabled {
+	background: #3a3f4a;
+	color: #7a8190;
+	cursor: not-allowed;
+}
+
+/* ---------- 카메라 확대 모달 ---------- */
+
+.camera-modal-overlay {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 17, 21, 0.92);
+	align-items: center;
+	justify-content: center;
+	z-index: 200;
+	padding: 20px;
+}
+
+.camera-modal-overlay.active {
+	display: flex;
+}
+
+.camera-modal {
+	position: relative;
+	background: #14161c;
+	border-radius: 12px;
+	padding: 24px;
+	width: 100%;
+	max-width: 760px;
+	max-height: 90vh;
+	overflow-y: auto;
+}
+
+.modal-close {
+	position: absolute;
+	top: 12px;
+	right: 16px;
+	background: none;
+	border: none;
+	color: #9aa0ab;
+	font-size: 22px;
+	cursor: pointer;
+	line-height: 1;
+}
+
+#detailTitle {
+	margin: 0 0 12px;
+	font-size: 16px;
+	padding-right: 24px;
+}
+
+.stats-panel {
+	display: flex;
+	gap: 16px;
+	margin-bottom: 16px;
+}
+
+.stat-box {
+	background: #1d212a;
+	border-radius: 8px;
+	padding: 12px 20px;
+	text-align: center;
+	min-width: 110px;
+}
+
+.stat-box span {
+	display: block;
+	font-size: 22px;
+	font-weight: bold;
+	color: #4fc3f7;
+}
+
+.stat-box label {
+	font-size: 11px;
+	color: #9aa0ab;
+}
+
+#chart {
+	max-height: 200px;
+	margin-bottom: 20px;
+}
+
+.camera-detail {
+	background: #1d212a;
+	border-radius: 8px;
+	padding: 16px;
+}
+
+.camera-detail .camera-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+
+.camera-detail button {
+	background: #4fc3f7;
+	border: none;
+	color: #0f1115;
+	padding: 7px 14px;
+	border-radius: 6px;
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 12px;
+}
+
+.camera-detail button:disabled {
+	background: #3a3f4a;
+	color: #7a8190;
+	cursor: not-allowed;
+}
+
+.camera-detail img {
+	width: 100%;
+	max-width: 720px;
+	border-radius: 8px;
+	margin-top: 10px;
+	display: block;
+}
+
+.status-badge {
+	padding: 2px 10px;
+	border-radius: 10px;
+	font-size: 11px;
+}
+
+.status-badge.STOPPED { background: #3a3f4a; color: #cfd3da; }
+.status-badge.PREPARING { background: #6b4e00; color: #ffd166; }
+.status-badge.RUNNING { background: #0d5c2f; color: #6ee89a; }
+.status-badge.ERROR { background: #5c0d0d; color: #ff8a8a; }
+
+/* ---------- 로그인/회원가입/승인대기 오버레이 ---------- */
+
+.overlay {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 17, 21, 0.92);
+	align-items: center;
+	justify-content: center;
+	z-index: 100;
+}
+
+.overlay.active {
+	display: flex;
+}
+
+.auth-box {
+	background: #1d212a;
+	border-radius: 12px;
+	padding: 28px;
+	width: 320px;
+	text-align: center;
+}
+
+.auth-box h2 {
+	margin: 0 0 16px;
+	font-size: 18px;
+}
+
+.auth-box p {
+	color: #9aa0ab;
+	font-size: 13px;
+}
+
+.auth-tabs {
+	display: flex;
+	margin-bottom: 16px;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.auth-tab-btn {
+	flex: 1;
+	padding: 8px;
+	background: #14161c;
+	border: none;
+	color: #9aa0ab;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.auth-tab-btn.active {
+	background: #4fc3f7;
+	color: #0f1115;
+	font-weight: bold;
+}
+
+.auth-form {
+	display: none;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.auth-form.active {
+	display: flex;
+}
+
+.auth-form input {
+	background: #14161c;
+	border: 1px solid #2a2e37;
+	border-radius: 6px;
+	padding: 10px;
+	color: #e8e8e8;
+	font-size: 13px;
+}
+
+.auth-form button[type="submit"] {
+	background: #4fc3f7;
+	border: none;
+	color: #0f1115;
+	padding: 10px;
+	border-radius: 6px;
+	font-weight: bold;
+	cursor: pointer;
+	margin-top: 4px;
+}
+
+.auth-error {
+	color: #ff8a8a;
+	font-size: 12px;
+	min-height: 16px;
+	margin: 0;
+}
+
+.auth-hint {
+	margin-top: 4px;
+}
+
+#pendingOverlay button {
+	margin-top: 12px;
+	background: #4fc3f7;
+	border: none;
+	color: #0f1115;
+	padding: 8px 16px;
+	border-radius: 6px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+/* ---------- 로그인한 사용자 정보 ---------- */
+
+.user-info {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	font-size: 13px;
+	color: #9aa0ab;
+}
+
+.user-info .role-badge {
+	background: #14161c;
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 11px;
+	color: #4fc3f7;
+}
+
+.user-info button {
+	background: none;
+	border: 1px solid #2a2e37;
+	color: #9aa0ab;
+	padding: 4px 10px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 12px;
+}
+
+/* ---------- 이벤트 로그 ---------- */
+
+#eventsMainPanel {
+	padding: 16px 20px;
+}
+
+#eventsMainPanel h2 {
+	font-size: 16px;
+	margin: 0 0 14px;
+}
+
+.event-badge {
+	background: #ff5c5c;
+	color: #fff;
+	font-size: 10px;
+	padding: 1px 6px;
+	border-radius: 8px;
+	margin-left: 2px;
+}
+
+.event-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.event-card {
+	background: #1d212a;
+	border-radius: 8px;
+	padding: 14px;
+	border-left: 4px solid #3a3f4a;
+}
+
+.event-card.level-1 {
+	border-left-color: #ffd166;
+}
+
+.event-card.level-2 {
+	border-left-color: #ff5c5c;
+}
+
+.event-card .event-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 6px;
+	font-size: 13px;
+}
+
+.event-card .event-meta {
+	font-size: 11px;
+	color: #9aa0ab;
+	margin-bottom: 8px;
+}
+
+.event-card .event-actions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.event-card .event-actions input {
+	flex: 1;
+	background: #14161c;
+	border: 1px solid #2a2e37;
+	border-radius: 6px;
+	padding: 6px 8px;
+	color: #e8e8e8;
+	font-size: 12px;
+}
+
+.event-card .event-actions button {
+	background: #4fc3f7;
+	border: none;
+	color: #0f1115;
+	padding: 6px 12px;
+	border-radius: 6px;
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 12px;
+	white-space: nowrap;
+}
+
+.event-card .event-actions button:disabled {
+	background: #3a3f4a;
+	color: #7a8190;
+	cursor: not-allowed;
+}
+
+.status-badge.UNCONFIRMED { background: #5c0d0d; color: #ff8a8a; }
+.status-badge.CONFIRMED { background: #6b4e00; color: #ffd166; }
+.status-badge.RESOLVED { background: #0d5c2f; color: #6ee89a; }

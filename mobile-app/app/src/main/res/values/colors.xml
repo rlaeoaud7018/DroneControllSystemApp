@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#0F1115</color>
+    <color name="panel">#1D212A</color>
+    <color name="accent">#4FC3F7</color>
+    <color name="textPrimary">#E8E8E8</color>
+    <color name="textSecondary">#9AA0AB</color>
+    <color name="statusRunning">#6EE89A</color>
+    <color name="statusPreparing">#FFD166</color>
+    <color name="statusStopped">#CFD3DA</color>
+</resources>

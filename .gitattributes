@@ -1,0 +1,2 @@
+analysis-server/sample_videos/*.mp4 filter=lfs diff=lfs merge=lfs -text
+analysis-server/sample_videos/*.avi filter=lfs diff=lfs merge=lfs -text
