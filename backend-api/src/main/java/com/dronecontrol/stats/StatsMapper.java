@@ -66,6 +66,15 @@ public interface StatsMapper {
 			+ "FROM zone_stats_minute WHERE zone_id = #{zoneId} AND at BETWEEN #{from} AND #{to} ORDER BY at")
 	List<ZoneMinuteStat> selectMinuteStats(@Param("zoneId") int zoneId, @Param("from") String from, @Param("to") String to);
 
+	@Select("SELECT zone_id AS zoneId, at, count_avg AS countAvg, count_max AS countMax, count_min AS countMin, "
+			+ "density, inflow_n AS inflowN, inflow_e AS inflowE, inflow_s AS inflowS, inflow_w AS inflowW, "
+			+ "outflow_n AS outflowN, outflow_e AS outflowE, outflow_s AS outflowS, outflow_w AS outflowW, "
+			+ "dwell_avg_sec AS dwellAvgSec, avg_speed_px_s AS avgSpeedPxS, "
+			+ "move_e AS moveE, move_ne AS moveNe, move_n AS moveN, move_nw AS moveNw, "
+			+ "move_w AS moveW, move_sw AS moveSw, move_s AS moveS, move_se AS moveSe "
+			+ "FROM zone_stats_minute WHERE zone_id = #{zoneId} AND at = #{minuteAt}")
+	ZoneMinuteStat selectMinuteStatAt(@Param("zoneId") int zoneId, @Param("minuteAt") String minuteAt);
+
 	class ZoneAreaInfo {
 		private int zoneId;
 		private BigDecimal areaM2;

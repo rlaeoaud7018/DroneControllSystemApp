@@ -113,6 +113,7 @@ function renderUserInfo() {
 		<button id="logoutBtn">로그아웃</button>
 	`;
 	document.getElementById("logoutBtn").addEventListener("click", logout);
+	document.getElementById("adminTabBtn").style.display = isAdminUser() ? "inline-block" : "none";
 }
 
 async function logout() {
@@ -964,19 +965,98 @@ async function handleRegisterCamera(zoneId) {
 
 // ---------- 카메라 확대 모달 ----------
 
+let statsSSE = null; // sse-001: 모달이 열려있는 동안만 구역 통계를 실시간 구독
+
 function openCameraModal(cameraId) {
 	selectedCameraId = cameraId;
 	lastModalSignature = null; // 새로 열 때는 항상 새로 그려서 라이브 스트림을 새로 연결한다
 	document.getElementById("cameraModalOverlay").classList.add("active");
+	document.getElementById("playbackResult").style.display = "none";
+
+	const now = new Date();
+	const tenMinAgo = new Date(now.getTime() - STATS_WINDOW_MINUTES * 60 * 1000);
+	document.getElementById("toolsFrom").value = toIsoNoOffset(tenMinAgo);
+	document.getElementById("toolsTo").value = toIsoNoOffset(now);
+
 	refreshModalCamera();
 	renderCameraGrid();
+
+	const camera = cameras.find((c) => c.id === cameraId);
+	if (camera) {
+		openStatsStream(camera.zoneId);
+	}
 }
 
 function closeCameraModal() {
 	document.getElementById("cameraModalOverlay").classList.remove("active");
 	selectedCameraId = null;
+	closeStatsStream();
 	renderCameraGrid();
 }
+
+/** 구역 통계를 실시간으로 구독해 상단 통계 박스를 즉시 갱신한다 (10초 폴링 대신). */
+function openStatsStream(zoneId) {
+	closeStatsStream();
+	statsSSE = new EventSource(`api/v1/zones/${zoneId}/stats/stream`);
+	statsSSE.addEventListener("stat", (ev) => {
+		const s = JSON.parse(ev.data);
+		document.getElementById("statCount").textContent = Math.round(s.countAvg);
+		document.getElementById("statDensity").textContent = Number(s.density).toFixed(3);
+		document.getElementById("statDwell").textContent = s.dwellAvgSec;
+	});
+	statsSSE.onerror = () => {
+		// 네트워크 문제 등으로 끊기면 브라우저가 자동 재연결을 시도한다. 별도 처리 불필요.
+	};
+}
+
+function closeStatsStream() {
+	if (statsSSE) {
+		statsSSE.close();
+		statsSSE = null;
+	}
+}
+
+document.getElementById("exportStatsBtn").addEventListener("click", () => {
+	if (selectedCameraId == null) return;
+	const camera = cameras.find((c) => c.id === selectedCameraId);
+	if (!camera) return;
+	const from = document.getElementById("toolsFrom").value;
+	const to = document.getElementById("toolsTo").value;
+	window.location = `api/v1/zones/${camera.zoneId}/stats/export?from=${from}&to=${to}`;
+});
+
+document.getElementById("playbackBtn").addEventListener("click", async () => {
+	if (selectedCameraId == null) return;
+	const camera = cameras.find((c) => c.id === selectedCameraId);
+	if (!camera) return;
+	const from = document.getElementById("toolsFrom").value;
+	const to = document.getElementById("toolsTo").value;
+
+	const result = document.getElementById("playbackResult");
+	result.style.display = "block";
+	result.innerHTML = "불러오는 중...";
+
+	const data = await fetchJson(`api/v1/zones/${camera.zoneId}/playback?from=${from}&to=${to}`);
+	const recordings = (data && data.recordings) || [];
+	const timeline = (data && data.timeline) || [];
+
+	result.innerHTML = `
+		<h4>녹화 이력 (${recordings.length}건)</h4>
+		${recordings.length === 0
+			? '<p class="playback-empty">선택한 기간에 재생된 녹화 이력이 없습니다.</p>'
+			: recordings.map((r) => `
+				<div class="playback-recording-row">
+					<span>${r.startedAt.replace("T", " ")}</span>
+					<span>${r.filePath}</span>
+				</div>
+			`).join("")}
+		<h4 style="margin-top:12px;">해당 구간 인원 추이 (${timeline.length}개 포인트)</h4>
+		${timeline.length === 0 ? '<p class="playback-empty">통계 데이터가 없습니다.</p>' : ""}
+	`;
+	if (timeline.length > 0) {
+		renderChart(timeline);
+	}
+});
 
 document.getElementById("cameraModalClose").addEventListener("click", closeCameraModal);
 document.getElementById("cameraModalOverlay").addEventListener("click", (e) => {
@@ -1192,6 +1272,7 @@ function setMainTab(tabName) {
 	document.getElementById("dashboardMainPanel").classList.toggle("active", tabName === "dashboard");
 	document.getElementById("statsMainPanel").classList.toggle("active", tabName === "stats");
 	document.getElementById("eventsMainPanel").classList.toggle("active", tabName === "events");
+	document.getElementById("adminMainPanel").classList.toggle("active", tabName === "admin");
 
 	if (statsNode) {
 		if (tabName === "stats") {
@@ -1207,6 +1288,62 @@ function setMainTab(tabName) {
 	if (tabName === "events") {
 		renderEventsTab();
 	}
+	if (tabName === "admin") {
+		renderAdminTab();
+	}
+}
+
+// ---------- 관리 탭: 혼잡 임계치 설정 전용 화면 (acman-007) ----------
+
+async function renderAdminTab() {
+	document.getElementById("adminDongName").textContent = currentDongName;
+	const body = document.getElementById("adminThresholdBody");
+
+	if (!isAdminUser()) {
+		body.innerHTML = `<tr><td colspan="4" class="playback-empty">관리자만 접근할 수 있습니다.</td></tr>`;
+		return;
+	}
+	if (zones.length === 0) {
+		body.innerHTML = `<tr><td colspan="4" class="playback-empty">선택된 동에 구역이 없습니다. 지역 필터에서 동을 먼저 선택하세요.</td></tr>`;
+		return;
+	}
+
+	body.innerHTML = zones.map((z) => `
+		<tr data-zone-id="${z.id}">
+			<td><strong>${z.name}</strong></td>
+			<td><input type="number" step="0.001" class="admin-level1" data-zone-id="${z.id}"></td>
+			<td><input type="number" step="0.001" class="admin-level2" data-zone-id="${z.id}"></td>
+			<td><button class="admin-save-btn" data-zone-id="${z.id}">저장</button></td>
+		</tr>
+	`).join("");
+
+	for (const zone of zones) {
+		const thresholds = (await fetchJson(`api/v1/zones/${zone.id}/thresholds`)) || [];
+		const level1 = thresholds.find((t) => t.levelNo === 1);
+		const level2 = thresholds.find((t) => t.levelNo === 2);
+		const row = body.querySelector(`tr[data-zone-id="${zone.id}"]`);
+		if (level1) row.querySelector(".admin-level1").value = level1.densityThreshold;
+		if (level2) row.querySelector(".admin-level2").value = level2.densityThreshold;
+	}
+
+	body.querySelectorAll(".admin-save-btn").forEach((btn) => {
+		btn.addEventListener("click", async () => {
+			const zoneId = Number(btn.dataset.zoneId);
+			const row = body.querySelector(`tr[data-zone-id="${zoneId}"]`);
+			const level1 = Number(row.querySelector(".admin-level1").value);
+			const level2 = Number(row.querySelector(".admin-level2").value);
+
+			const res = await fetch(`api/v1/zones/${zoneId}/thresholds`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify([
+					{ zoneId, levelNo: 1, densityThreshold: level1 },
+					{ zoneId, levelNo: 2, densityThreshold: level2 },
+				]),
+			});
+			alert(res.ok ? `${zoneName(zoneId)} 기준이 저장되었습니다.` : "저장에 실패했습니다.");
+		});
+	});
 }
 
 document.querySelectorAll(".main-tab-btn").forEach((btn) => {

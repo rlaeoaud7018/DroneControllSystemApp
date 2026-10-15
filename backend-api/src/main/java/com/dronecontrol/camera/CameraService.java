@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dronecontrol.recording.RecordingService;
+
 @Service
 public class CameraService {
 
@@ -13,6 +15,9 @@ public class CameraService {
 
 	@Autowired
 	private AnalysisServerClient analysisServerClient;
+
+	@Autowired
+	private RecordingService recordingService;
 
 	public Camera createCamera(Camera camera) {
 		int result = cameraMapper.insertCamera(camera);
@@ -81,6 +86,10 @@ public class CameraService {
 			}
 			cameraMapper.updateStatus(id, "PREPARING");
 			existing.setStatus("PREPARING");
+			if ("DUMMY".equals(existing.getSourceType())) {
+				// 더미캠은 녹화 영상을 재생하는 것이므로, 가동될 때마다 재생 이력을 녹화 기록으로 남긴다(repfocus-001).
+				recordingService.recordPlaybackStart(id, existing.getSourceUri());
+			}
 			return UpdateResult.ok(existing);
 		}
 

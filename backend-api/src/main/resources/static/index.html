@@ -15,6 +15,7 @@
 		<button class="main-tab-btn active" data-maintab="dashboard">대시보드</button>
 		<button class="main-tab-btn" data-maintab="stats">통계 · 구역 비교</button>
 		<button class="main-tab-btn" data-maintab="events">이벤트 로그 <span id="eventBadge" class="event-badge" style="display:none;">0</span></button>
+		<button class="main-tab-btn" id="adminTabBtn" data-maintab="admin" style="display:none;">관리</button>
 	</nav>
 
 	<div class="topbar-hint">지도를 움직이면 화면 안의 카메라가 위에 갱신됩니다 · 카드를 클릭하면 확대 · 지도 빈 곳을 우클릭하면 카메라 추가</div>
@@ -117,6 +118,18 @@
 		<div id="eventList" class="event-list"></div>
 	</div>
 
+	<!-- ---------- 관리 (혼잡 임계치 설정 전용 화면, 관리자 전용) ---------- -->
+	<div id="adminMainPanel" class="main-tab-panel">
+		<h2>혼잡 임계치 설정</h2>
+		<p class="admin-hint">현재 선택된 동(<span id="adminDongName">-</span>) 소속 구역의 혼잡 단계 기준을 구역별로 직접 설정합니다.</p>
+		<table class="admin-threshold-table">
+			<thead>
+				<tr><th>구역</th><th>주의 단계 기준 (명/㎡)</th><th>위험 단계 기준 (명/㎡)</th><th></th></tr>
+			</thead>
+			<tbody id="adminThresholdBody"></tbody>
+		</table>
+	</div>
+
 </div><!-- /dashboardRoot -->
 
 <!-- 통계 패널 내용 (대시보드 탭의 오버레이 사이드바 / 통계 탭의 전체 화면, 둘 중 한 곳에 붙여서 재사용) -->
@@ -204,6 +217,13 @@
 		</div>
 
 		<canvas id="chart" height="90"></canvas>
+
+		<div class="modal-tools">
+			<label>기간 <input type="datetime-local" id="toolsFrom"> ~ <input type="datetime-local" id="toolsTo"></label>
+			<button id="exportStatsBtn" class="tool-btn">⬇ 엑셀 다운로드</button>
+			<button id="playbackBtn" class="tool-btn">▶ 녹화 재생</button>
+		</div>
+		<div id="playbackResult" class="playback-result" style="display:none;"></div>
 
 		<div id="cameraDetail" class="camera-detail"></div>
 	</div>

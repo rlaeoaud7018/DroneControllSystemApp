@@ -1049,3 +1049,114 @@ body {
 .status-badge.UNCONFIRMED { background: #5c0d0d; color: #ff8a8a; }
 .status-badge.CONFIRMED { background: #6b4e00; color: #ffd166; }
 .status-badge.RESOLVED { background: #0d5c2f; color: #6ee89a; }
+
+/* ---------- 관리 탭: 혼잡 임계치 설정 전용 화면 ---------- */
+
+.admin-hint {
+	color: #9aa0ab;
+	font-size: 13px;
+	margin: 0 0 16px;
+}
+
+.admin-threshold-table {
+	width: 100%;
+	border-collapse: collapse;
+	background: #1d212a;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.admin-threshold-table th {
+	background: #23272f;
+	color: #9aa0ab;
+	text-align: left;
+	font-size: 12px;
+	padding: 12px 14px;
+}
+
+.admin-threshold-table td {
+	padding: 10px 14px;
+	border-top: 1px solid #272b33;
+	font-size: 13px;
+}
+
+.admin-threshold-table input {
+	background: #0f1115;
+	border: 1px solid #3a3f4a;
+	color: #e8e8e8;
+	border-radius: 6px;
+	padding: 6px 10px;
+	width: 120px;
+}
+
+.admin-threshold-table button {
+	background: #4fc3f7;
+	border: none;
+	color: #0f1115;
+	padding: 6px 14px;
+	border-radius: 6px;
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 12px;
+}
+
+/* ---------- 카메라 모달: 엑셀 다운로드 · 녹화 재생 ---------- */
+
+.modal-tools {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-bottom: 14px;
+	font-size: 12px;
+	color: #9aa0ab;
+}
+
+.modal-tools input[type="datetime-local"] {
+	background: #1d212a;
+	border: 1px solid #3a3f4a;
+	color: #e8e8e8;
+	border-radius: 6px;
+	padding: 4px 8px;
+	font-size: 12px;
+}
+
+.tool-btn {
+	background: #2a2f3a;
+	border: 1px solid #3a3f4a;
+	color: #e8e8e8;
+	padding: 7px 12px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 12px;
+}
+
+.tool-btn:hover {
+	background: #3a3f4a;
+}
+
+.playback-result {
+	background: #1d212a;
+	border-radius: 8px;
+	padding: 14px;
+	margin-bottom: 16px;
+	font-size: 12px;
+}
+
+.playback-result h4 {
+	margin: 0 0 8px;
+	font-size: 13px;
+	color: #4fc3f7;
+}
+
+.playback-recording-row {
+	display: flex;
+	justify-content: space-between;
+	padding: 6px 0;
+	border-top: 1px solid #272b33;
+	color: #c7ccd6;
+}
+
+.playback-empty {
+	color: #6a7180;
+}

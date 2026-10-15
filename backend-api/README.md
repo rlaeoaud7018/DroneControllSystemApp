@@ -49,6 +49,9 @@ MySQL(`db_dronecontrol`)이 로컬에서 돌고 있어야 한다 (Windows 서비
 - **zone**: `GET /api/v1/zones?dongId=`, `GET/{id}`, `POST`, `PATCH/{id}`
   - `PUT/{id}/neighbors`, `GET/{id}/neighbors` — 반대 방향 자동 등록(N↔S, E↔W), 자기 자신 지정 시 400
   - `GET/{id}/stats?from=ISO&to=ISO`
+  - `GET/{id}/stats/export?from=ISO&to=ISO` — 엑셀(xlsx) 다운로드
+  - `GET/{id}/stats/stream` — SSE 실시간 스트림
+  - `GET/{id}/playback?from=ISO&to=ISO` — 녹화 이력 + 통계 타임라인
 - **camera**: `GET /api/v1/cameras?zoneId=`, `GET/{id}`, `POST`, `PATCH/{id}`
   - `PATCH/{id}/state` (`{"state":"RUNNING"}`/`"STOPPED"`), 가동 중 입력정보 변경 시 409
 - **internal (analysis-server 전용, 외부 비노출)**:
@@ -84,8 +87,13 @@ Servlet+JDBC 버전과 완전히 동일한 결과(러닝 평균·합산 수치 �
 
 작업 시작 전에 DB 스키마([../db/schema.sql](../db/schema.sql)) 확인.
 
+## 통계 엑셀 다운로드 · SSE 실시간 스트림 · 녹화 재생 (신규, 전부 동작 검증 완료)
+
+- **엑셀 다운로드(export-001)**: `GET /api/v1/zones/{id}/stats/export?from=&to=` — Apache POI(`poi-ooxml`)로 구역 분단위 통계를 xlsx로 생성해 다운로드. 헤더 스타일 적용, 자동 열너비, 틀고정(1행) 적용. 실제 파일 다운로드 후 openpyxl로 내용 일치까지 확인
+- **SSE 실시간 스트림(sse-001)**: `GET /api/v1/zones/{id}/stats/stream` — `SseEmitter` 기반, `StatsService.recordSample()`이 분단위 통계를 갱신할 때마다 구독 중인 연결에 `stat` 이벤트로 즉시 push(폴링 불필요). 구독자가 없는 구역은 매번 DB를 추가 조회하지 않도록 구독자 존재 여부를 먼저 확인. curl로 SSE 연결을 열어둔 채 `/internal/v1/stats`를 호출해 실시간 push 확인 완료
+- **녹화 재생(repfocus-001)**: `GET /api/v1/zones/{id}/playback?from=&to=` — 해당 구간의 녹화 이력(`recordings` 테이블, DUMMY 캠이 RUNNING으로 전환될 때마다 재생 시작 이력을 자동 기록)과 통계 타임라인을 함께 반환. web-dashboard에서 녹화 목록 + 인원 추이 그래프로 재생
+
 ## 아직 안 한 것
 
 - 비밀번호 재설정, 관리자가 다른 관리자를 관리하는 기능(acman-004~006)
-- 통계 엑셀 다운로드, SSE 실시간 스트림(`/api/v1/stats/stream`)
-- 녹화 재생(`/api/v1/zones/{id}/playback`), 구역 간 이동 조회(`/api/v1/regions/{id}/flows`)
+- 구역 간 이동 조회(`/api/v1/regions/{id}/flows`) — `zone_flows` 테이블 집계 로직 자체가 아직 없음
