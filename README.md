@@ -11,7 +11,7 @@
 | 모듈 | 역할 | 비고 |
 |---|---|---|
 | [backend-api](backend-api/README.md) | 회원/지역/구역/캠/통계/이벤트/히스토리 REST API, DB 연동 | Spring Boot + MyBatis |
-| [analysis-server](analysis-server/README.md) | 영상에서 인원수·이동·밀집도 분석 | Flask(Python), YOLOv8n+ByteTrack |
+| [analysis-server](analysis-server/README.md) | 영상에서 인원수·이동·밀집도 분석 | Flask(Python), YOLOv8s+ByteTrack |
 | [web-dashboard](web-dashboard/README.md) | 지도+그래프+히트맵 PC 대시보드 | |
 | [mobile-app](mobile-app/README.md) | 로그인/가입, 구역·캠 조회, 가동·정지, 실시간 영상, 지도, 이벤트 처리 | Android (Gradle 빌드+에뮬레이터 실행 검증 완료) |
 | [db](db/README.md) | DB 스키마 | |
