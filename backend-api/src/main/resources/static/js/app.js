@@ -15,8 +15,9 @@ const STATS_WINDOW_MINUTES = 10;
 const DENSITY_CAUTION = 0.01;
 const DENSITY_DANGER = 0.02;
 
-const DONUT_COLORS = ["#4fc3f7", "#ffd166", "#6ee89a", "#ff8a8a", "#b39ddb", "#f48fb1"];
-const LEVEL_COLOR = { normal: "#4fc3f7", caution: "#ffd166", danger: "#ff5c5c" };
+// 발표자료(PPTX)와 동일한 인디고 브랜드 컬러 체계로 통일
+const DONUT_COLORS = ["#4a55e8", "#f28a3c", "#1fa96b", "#e04b4b", "#8b7bd8", "#e06bb0"];
+const LEVEL_COLOR = { normal: "#1fa96b", caution: "#f28a3c", danger: "#e04b4b" };
 
 let zones = [];
 let cameras = []; // { ...camera, zoneName, zoneId, areaM2 }
@@ -384,6 +385,8 @@ function renderSummary() {
 	statsNode.querySelector(".sumWorstZone").textContent = worstZoneName;
 	statsNode.querySelector(".sumEventCount").textContent = openEventCount;
 
+	renderSummaryTiles(Math.round(totalCount));
+
 	let normal = 0, caution = 0, danger = 0;
 	for (const zone of zones) {
 		const stat = latestStatsByZoneId[zone.id];
@@ -395,6 +398,19 @@ function renderSummary() {
 	document.getElementById("legendNormal").textContent = normal;
 	document.getElementById("legendCaution").textContent = caution;
 	document.getElementById("legendDanger").textContent = danger;
+}
+
+/** 상단 요약 타일(관제구역/가동카메라/감지인원/미처리이벤트) 갱신. totalPeople 생략 시 기존 값 유지. */
+function renderSummaryTiles(totalPeople) {
+	const zoneEl = document.getElementById("tileZoneCount");
+	if (!zoneEl) return; // 로그인 전 등 DOM 미구성 시 무시
+	zoneEl.textContent = zones.length;
+	document.getElementById("tileCamRunning").textContent = cameras.filter((c) => c.status === "RUNNING").length;
+	document.getElementById("tileCamTotal").textContent = "/" + cameras.length;
+	if (totalPeople !== undefined) {
+		document.getElementById("tilePeopleCount").textContent = totalPeople;
+	}
+	document.getElementById("tileEventCount").textContent = openEventCount;
 }
 
 function renderDonut() {
@@ -1121,18 +1137,18 @@ function renderChart(stats) {
 			datasets: [{
 				label: "인원수(1분 평균)",
 				data,
-				borderColor: "#4fc3f7",
-				backgroundColor: "rgba(79,195,247,0.15)",
+				borderColor: "#4a55e8",
+				backgroundColor: "rgba(74,85,232,0.12)",
 				tension: 0.3,
 				fill: true,
 			}],
 		},
 		options: {
 			scales: {
-				x: { ticks: { color: "#9aa0ab" } },
-				y: { ticks: { color: "#9aa0ab" }, beginAtZero: true },
+				x: { ticks: { color: "#6b7280" }, grid: { color: "#e7e9f1" } },
+				y: { ticks: { color: "#6b7280" }, beginAtZero: true, grid: { color: "#e7e9f1" } },
 			},
-			plugins: { legend: { labels: { color: "#e8e8e8" } } },
+			plugins: { legend: { labels: { color: "#1c2030" } } },
 		},
 	});
 }
@@ -1203,6 +1219,7 @@ async function refreshEventBadge() {
 	if (statsNode) {
 		statsNode.querySelector(".sumEventCount").textContent = openEventCount;
 	}
+	renderSummaryTiles();
 
 	return events;
 }
@@ -1218,7 +1235,7 @@ async function renderEventsTab() {
 	const listEl = document.getElementById("eventList");
 
 	if (events.length === 0) {
-		listEl.innerHTML = '<p style="color:#9aa0ab;">발생한 이벤트가 없습니다.</p>';
+		listEl.innerHTML = '<p style="color:#6b7280;">발생한 이벤트가 없습니다.</p>';
 		return;
 	}
 
@@ -1380,8 +1397,8 @@ document.querySelectorAll(".main-tab-btn").forEach((btn) => {
 
 function markerIcon(color) {
 	const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34">` +
-		`<circle cx="17" cy="17" r="15" fill="${color}" stroke="#0f1115" stroke-width="2"/>` +
-		`<path d="M11 13h3l1.2-2h3.6l1.2 2h3v8H11z" fill="#0f1115"/>` +
+		`<circle cx="17" cy="17" r="15" fill="${color}" stroke="#ffffff" stroke-width="2.5"/>` +
+		`<path d="M11 13h3l1.2-2h3.6l1.2 2h3v8H11z" fill="#ffffff"/>` +
 		`<circle cx="17" cy="17" r="2.6" fill="${color}"/>` +
 		`</svg>`;
 	return {
@@ -1403,15 +1420,16 @@ window.initMap = function () {
 		mapTypeControl: false,
 		streetViewControl: false,
 		styles: [
-			{ elementType: "geometry", stylers: [{ color: "#1d212a" }] },
-			{ elementType: "labels.text.fill", stylers: [{ color: "#8a929e" }] },
-			{ elementType: "labels.text.stroke", stylers: [{ color: "#1d212a" }] },
+			{ elementType: "geometry", stylers: [{ color: "#f1f3f8" }] },
+			{ elementType: "labels.text.fill", stylers: [{ color: "#8d93a3" }] },
+			{ elementType: "labels.text.stroke", stylers: [{ color: "#ffffff" }] },
 			{ featureType: "poi", stylers: [{ visibility: "off" }] },
 			{ featureType: "transit", stylers: [{ visibility: "off" }] },
-			{ featureType: "road", elementType: "geometry", stylers: [{ color: "#2a2f3a" }] },
+			{ featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+			{ featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#dfe3ee" }] },
 			{ featureType: "road", elementType: "labels", stylers: [{ visibility: "simplified" }] },
-			{ featureType: "administrative", elementType: "geometry", stylers: [{ color: "#3a4150" }] },
-			{ featureType: "water", elementType: "geometry", stylers: [{ color: "#17191f" }] },
+			{ featureType: "administrative", elementType: "geometry", stylers: [{ color: "#c7cce0" }] },
+			{ featureType: "water", elementType: "geometry", stylers: [{ color: "#dbe6f6" }] },
 		],
 	});
 	wireMapRightClick();
@@ -1497,7 +1515,7 @@ function renderMapMarkers() {
 setTimeout(() => {
 	if (typeof google === "undefined") {
 		document.getElementById("map").innerHTML =
-			'<div style="padding:20px;color:#9aa0ab;">구글 지도 API 키가 설정되지 않았습니다. index.html의 YOUR_GOOGLE_MAPS_API_KEY를 발급받은 키로 교체하세요.</div>';
+			'<div style="padding:20px;color:#6b7280;">구글 지도 API 키가 설정되지 않았습니다. index.html의 YOUR_GOOGLE_MAPS_API_KEY를 발급받은 키로 교체하세요.</div>';
 	}
 }, 3000);
 
